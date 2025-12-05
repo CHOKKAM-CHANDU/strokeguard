@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stroke Risk Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 480px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.15);
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4a90e2;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background: #357ac9; }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Stroke Risk Prediction</h2>
+
+    <label>Gender</label>
+    <select id="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+    </select>
+
+    <label>Age</label>
+    <input type="number" id="age">
+
+    <label>Hypertension (0/1)</label>
+    <input type="number" id="hypertension">
+
+    <label>Heart Disease (0/1)</label>
+    <input type="number" id="heart_disease">
+
+    <label>Ever Married</label>
+    <select id="ever_married">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+    </select>
+
+    <label>Work Type</label>
+    <select id="work_type">
+        <option value="Private">Private</option>
+        <option value="Self-employed">Self-employed</option>
+        <option value="Govt_job">Govt_job</option>
+        <option value="children">children</option>
+        <option value="Never_worked">Never_worked</option>
+    </select>
+
+    <label>Residence Type</label>
+    <select id="Residence_type">
+        <option value="Urban">Urban</option>
+        <option value="Rural">Rural</option>
+    </select>
+
+    <label>Avg Glucose Level</label>
+    <input type="number" id="glucose" step="0.01">
+
+    <label>BMI</label>
+    <input type="number" id="bmi" step="0.1">
+
+    <label>Smoking Status</label>
+    <select id="smoking_status">
+        <option value="never smoked">never smoked</option>
+        <option value="formerly smoked">formerly smoked</option>
+        <option value="smokes">smokes</option>
+        <option value="Unknown">Unknown</option>
+    </select>
+
+    <button onclick="predict()">Predict</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    async function predict() {
+        let data = {
+            gender: document.getElementById("gender").value,
+            age: parseFloat(document.getElementById("age").value),
+            hypertension: parseInt(document.getElementById("hypertension").value),
+            heart_disease: parseInt(document.getElementById("heart_disease").value),
+            ever_married: document.getElementById("ever_married").value,
+            work_type: document.getElementById("work_type").value,
+            Residence_type: document.getElementById("Residence_type").value,
+            avg_glucose_level: parseFloat(document.getElementById("glucose").value),
+            bmi: parseFloat(document.getElementById("bmi").value),
+            smoking_status: document.getElementById("smoking_status").value
+        };
+
+        const res = await fetch("http://127.0.0.1:8000/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        const output = await res.json();
+
+        document.getElementById("result").style.display = "block";
+        document.getElementById("result").innerHTML =
+            `<b>Stroke Prediction:</b> ${output.stroke_prediction} <br>
+             <b>Risk Probability:</b> ${(output.risk_probability * 100).toFixed(2)}%`;
+    }
+</script>
+
+</body>
+</html>
